@@ -1,0 +1,464 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ToyTalk Form A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F7; --surface:#FFFFFF; --sunk:#F7F8FA; --fg:#17202D; --muted:#5A6474; --faint:#8A93A2; --line:#DCE1E7;
+  --accent:#1D5FA8; --accent-ink:#FFFFFF; --accent-soft:#E6EEF8;
+  --ok:#1E7A4F; --ok-soft:#E3F2EA; --no:#A23B2E; --no-soft:#F7E7E4;
+  --paper:#FFFDF8; --paper-line:#E7E1D3;
+  --display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --ui:"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --child:"Andika", "Trebuchet MS", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A2029; --sunk:#151A22; --fg:#E7EAEF; --muted:#A2AAB7; --faint:#7A8392; --line:#2D3542;
+  --accent:#8DB3EA; --accent-ink:#0F1520; --accent-soft:#1F2C40;
+  --ok:#74CF9F; --ok-soft:#173326; --no:#EE9A8C; --no-soft:#3A201C; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A2029; --sunk:#151A22; --fg:#E7EAEF; --muted:#A2AAB7; --faint:#7A8392; --line:#2D3542;
+  --accent:#8DB3EA; --accent-ink:#0F1520; --accent-soft:#1F2C40;
+  --ok:#74CF9F; --ok-soft:#173326; --no:#EE9A8C; --no-soft:#3A201C; color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:15px;line-height:1.55;margin:0}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:12px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.mark{display:flex;flex-direction:column;gap:0;min-width:0}
+.mark b{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.005em}
+.mark span{font:400 12px var(--mono);color:var(--muted);letter-spacing:.04em}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.switch{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--ui);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer}
+.switch i{width:30px;height:18px;border-radius:999px;background:var(--line);position:relative;transition:background .15s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch[aria-pressed="true"] i{background:var(--accent)}
+.switch[aria-pressed="true"] i::after{transform:translateX(12px)}
+.picker{display:none;font:500 14px var(--ui);color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:100%}
+
+.shell{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:24px 64px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}
+.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 110px);overflow:auto;padding-right:4px}
+.index h3{font:500 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 6px 10px}
+.index ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.index button{width:100%;display:grid;grid-template-columns:30px minmax(0,1fr);gap:6px;align-items:baseline;text-align:left;background:transparent;border:0;border-radius:7px;padding:6px 10px;color:var(--fg);cursor:pointer;font-size:14px}
+.index button span:first-child{font:500 12px var(--mono);color:var(--faint)}
+.index button:hover{background:var(--sunk)}
+.index button[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+.index button[aria-current="true"] span:first-child{color:var(--accent)}
+
+.view{min-width:0;display:flex;flex-direction:column;gap:18px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px 28px;display:flex;flex-direction:column;gap:22px}
+.shead{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px}
+.shead .k{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.shead h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,3vw,30px);line-height:1.15;margin:2px 0 0;text-wrap:balance}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font:500 12px var(--mono);border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--muted);background:var(--sunk)}
+.tag.c{color:var(--accent);border-color:transparent;background:var(--accent-soft)}
+
+.lbl{font:500 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+.stim{background:var(--paper);border:1px solid var(--paper-line);border-radius:10px;padding:12px;display:flex;justify-content:center}
+.stim svg{width:100%;max-width:600px;height:auto;display:block}
+.script{background:var(--sunk);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 18px;font-size:17px;line-height:1.55;max-width:75ch}
+.script b{font-weight:600}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.opt{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
+.opt .pic{background:var(--paper);border-bottom:1px solid var(--paper-line);padding:8px}
+.opt .pic svg{width:100%;height:auto;display:block}
+.opt .cap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;padding:12px 12px 14px;align-items:start}
+.opt .cap .L{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--fg);display:grid;place-items:center;font:600 13px var(--ui)}
+.opt .cap .t{font-size:15px;line-height:1.4}
+.opt .why{display:none;margin:0 12px 12px;padding:9px 11px;border-radius:7px;font-size:13.5px;line-height:1.45}
+body.ans .opt .why{display:block}
+body.ans .opt.ok{border-color:var(--ok);box-shadow:0 0 0 2px var(--ok-soft)}
+body.ans .opt.ok .L{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+body.ans .opt.ok .why{background:var(--ok-soft);color:var(--fg)}
+body.ans .opt.no .why{background:var(--sunk);color:var(--muted)}
+.why b{font-weight:600}
+body.ans .opt.ok .why b{color:var(--ok)}
+body.ans .opt.no .why b{color:var(--no)}
+
+.key{display:none;border-top:1px solid var(--line);padding-top:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 24px}
+body.ans .key{display:grid}
+.key dt{font:500 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.key dd{margin:3px 0 0;font-size:14.5px}
+.only-ans{display:none}
+body.ans .only-ans{display:flex}
+
+.prompts{margin:0;padding-left:22px;font-size:17px;display:flex;flex-direction:column;gap:4px}
+.rub{display:none}
+body.ans .rub{display:block}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+td:first-child{font:600 14px var(--mono);width:56px}
+td:last-child{color:var(--muted)}
+
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cast figure{margin:0;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper);padding:10px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#17202D}
+.cast svg{width:100%;max-width:150px;height:auto}
+.cast figcaption{font-family:var(--child);font-size:17px;text-align:center;line-height:1.25}
+.cast figcaption small{display:block;font-size:13px;color:#5A6474}
+
+.pager{display:flex;justify-content:space-between;gap:12px}
+.pager button{flex:1;max-width:48%;display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;color:var(--fg)}
+.pager button:last-child{text-align:right;align-items:flex-end}
+.pager button span{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.pager button b{font-weight:500;font-size:14.5px}
+.pager button:hover{border-color:var(--accent)}
+.pager button:disabled{visibility:hidden}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .index{display:none}
+  .picker{display:block}
+}
+@media (max-width:600px){
+  .sheet{padding:18px 16px}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .opt{display:grid;grid-template-columns:120px minmax(0,1fr)}
+  .opt .pic{border-bottom:0;border-right:1px solid var(--paper-line)}
+  .opt .why{grid-column:1 / -1}
+  .cast{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .script{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){.switch i,.switch i::after{transition:none}}
+</style>
+
+<div class="top">
+  <div class="top-in">
+    <div class="mark"><b>ToyTalk Assessment Draft</b></div>
+    <div class="tools">
+      <select class="picker" id="picker" aria-label="Go to item"></select>
+      <button type="button" class="switch" id="ans" aria-pressed="false"><i aria-hidden="true"></i>Answer key</button>
+    </div>
+  </div>
+</div>
+<div class="shell">
+  <nav class="index" id="index" aria-label="Items"></nav>
+  <main class="view">
+    <div id="sheet"></div>
+    <div class="pager"><button type="button" id="prev"><span>Previous</span><b></b></button><button type="button" id="next"><span>Next</span><b></b></button></div>
+  </main>
+</div>
+<script>
+const INK='#2B2A33', W='#FFFFFF';
+const F='font-family="Andika, Trebuchet MS, sans-serif"';
+const sw='stroke="'+INK+'" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+function T(x,y,s,size=14,anchor='middle',weight=400,fill=INK){return `<text x="${x}" y="${y}" ${F} font-size="${size}" font-weight="${weight}" text-anchor="${anchor}" fill="${fill}">${s}</text>`}
+function lines(x,y,arr,size=14,lh=1.25,anchor='middle',weight=400){return arr.map((s,i)=>T(x,y+i*size*lh,s,size,anchor,weight)).join('')}
+function g(x,y,s,inner){return `<g transform="translate(${x} ${y}) scale(${s})">${inner}</g>`}
+
+/* characters */
+function bear(x,y,s=1,extra=''){return g(x,y,s,`
+<ellipse cx="0" cy="44" rx="27" ry="24" fill="#C98B54" ${sw}/>
+<ellipse cx="0" cy="48" rx="14" ry="13" fill="#F1D3B0"/>
+<circle cx="-20" cy="-21" r="9" fill="#C98B54" ${sw}/><circle cx="20" cy="-21" r="9" fill="#C98B54" ${sw}/>
+<circle cx="-20" cy="-21" r="4" fill="#F1D3B0"/><circle cx="20" cy="-21" r="4" fill="#F1D3B0"/>
+<circle cx="0" cy="0" r="26" fill="#C98B54" ${sw}/>
+<ellipse cx="0" cy="9" rx="11" ry="8" fill="#F1D3B0"/>
+<circle cx="-9" cy="-5" r="2.8" fill="${INK}"/><circle cx="9" cy="-5" r="2.8" fill="${INK}"/>
+<ellipse cx="0" cy="5" rx="4" ry="3" fill="${INK}"/>
+<path d="M-4 12 Q0 15 4 12" fill="none" ${sw}/><g transform="translate(30 -34)"><rect x="-13" y="-8.5" width="26" height="17" rx="8.5" fill="#1D5FA8" stroke="#2B2A33" stroke-width="1.6"/><text x="0" y="4" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#FFFFFF">AI</text></g>${extra}`)}
+function owl(x,y,s=1){return g(x,y,s,`
+<path d="M-24 -18 L-20 -36 L-8 -24 Z M24 -18 L20 -36 L8 -24 Z" fill="#6F8F73" ${sw}/>
+<ellipse cx="0" cy="10" rx="28" ry="38" fill="#7FA383" ${sw}/>
+<ellipse cx="0" cy="24" rx="17" ry="22" fill="#D9E6CF"/>
+<circle cx="-11" cy="-8" r="11" fill="${W}" ${sw}/><circle cx="11" cy="-8" r="11" fill="${W}" ${sw}/>
+<circle cx="-10" cy="-7" r="4.5" fill="${INK}"/><circle cx="10" cy="-7" r="4.5" fill="${INK}"/>
+<path d="M-5 3 L5 3 L0 11 Z" fill="#E9A23B" ${sw}/>
+<path d="M-12 47 l-4 6 M-8 47 l0 7 M8 47 l0 7 M12 47 l4 6" fill="none" stroke="#E9A23B" stroke-width="3" stroke-linecap="round"/><g transform="translate(34 -30)"><rect x="-13" y="-8.5" width="26" height="17" rx="8.5" fill="#1D5FA8" stroke="#2B2A33" stroke-width="1.6"/><text x="0" y="4" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#FFFFFF">AI</text></g>`)}
+function robot(x,y,s=1,col='#5B8DD6',mouth='smile'){
+  const m = mouth==='shout'?`<ellipse cx="0" cy="2" rx="7" ry="6" fill="${INK}"/>`:mouth==='flat'?`<path d="M-7 2 L7 2" ${sw}/>`:`<path d="M-7 0 Q0 6 7 0" fill="none" ${sw}/>`;
+  return g(x,y,s,`
+<path d="M0 -26 L0 -38" ${sw}/><circle cx="0" cy="-41" r="5" fill="#F2C14E" ${sw}/>
+<rect x="-26" y="-26" width="52" height="40" rx="10" fill="${col}" ${sw}/>
+<rect x="-18" y="-19" width="36" height="27" rx="6" fill="#EAF2FF" ${sw}/>
+<circle cx="-8" cy="-9" r="3" fill="${INK}"/><circle cx="8" cy="-9" r="3" fill="${INK}"/>${m.replace(/cy="2"/,'cy="0"')}
+<rect x="-20" y="18" width="40" height="34" rx="8" fill="${col}" ${sw}/>
+<circle cx="0" cy="33" r="5" fill="#F2C14E" ${sw}/>
+<path d="M-20 26 L-32 38 M20 26 L32 38" ${sw}/><g transform="translate(36 -28)"><rect x="-13" y="-8.5" width="26" height="17" rx="8.5" fill="#1D5FA8" stroke="#2B2A33" stroke-width="1.6"/><text x="0" y="4" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10.5" font-weight="700" text-anchor="middle" fill="#FFFFFF">AI</text></g>`)}
+function kid(x,y,s=1,shirt='#E36F5A',skin='#E0AC69',hair='#3B2A20',style=0){
+  const h = style===1?`<path d="M-16 -2 Q-18 -20 0 -19 Q18 -20 16 -2 Q12 -12 0 -12 Q-12 -12 -16 -2 Z" fill="${hair}"/><path d="M-16 -4 Q-22 14 -14 22 M16 -4 Q22 14 14 22" fill="none" stroke="${hair}" stroke-width="6" stroke-linecap="round"/>`
+          : style===2?`<circle cx="0" cy="-15" r="9" fill="${hair}"/><path d="M-16 -2 Q-16 -18 0 -17 Q16 -18 16 -2 Q8 -10 0 -10 Q-8 -10 -16 -2 Z" fill="${hair}"/>`
+          : `<path d="M-16 -2 Q-17 -19 0 -19 Q17 -19 16 -2 Q10 -9 0 -9 Q-10 -9 -16 -2 Z" fill="${hair}"/>`;
+  return g(x,y,s,`
+<rect x="-15" y="17" width="30" height="36" rx="10" fill="${shirt}" ${sw}/>
+<circle cx="0" cy="0" r="16" fill="${skin}" ${sw}/>${h}
+<circle cx="-6" cy="1" r="2.2" fill="${INK}"/><circle cx="6" cy="1" r="2.2" fill="${INK}"/>
+<path d="M-5 8 Q0 11 5 8" fill="none" ${sw}/>`)}
+/* speech bubble: box at x,y size w,h; tail points to tx,ty */
+function bubble(x,y,w,h,txt,tx,ty,size=14,opt={}){
+  const cx=x+w/2; let tail, cover;
+  if(ty>=y && ty<=y+h){ const ex=tx<x?x:x+w; const by=Math.min(Math.max(ty,y+14),y+h-14);
+    tail=`M${ex} ${by-7} L${tx} ${ty} L${ex} ${by+7}`; cover=`M${ex} ${by-5.6} L${ex} ${by+5.6}`; }
+  else { const edge=ty>y+h?y+h:y; const bx=Math.min(Math.max(tx,x+16),x+w-16);
+    tail=`M${bx-8} ${edge} L${tx} ${ty} L${bx+8} ${edge}`; cover=`M${bx-6.6} ${edge} L${bx+6.6} ${edge}`; }
+  const arr = Array.isArray(txt)?txt:[txt]; const lh=size*1.22; const top=y+h/2-(arr.length-1)*lh/2+size*0.36;
+  const fill=opt.fill||W;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="${fill}" ${sw}/><path d="${tail}" fill="${fill}" ${sw}/><path d="${cover}" stroke="${fill}" stroke-width="4"/>${arr.map((s,i)=>T(cx,top+i*lh,s,size,'middle',opt.bold?700:400)).join('')}`}
+function card(x,y,w,h,title,rows,size=13){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${W}" ${sw}/><path d="M${x} ${y+22} L${x+w} ${y+22}" ${sw}/>
+${gear(x+13,y+11,0.55)}${T(x+26,y+16,title,12,'start',700)}${rows.map((r,i)=>T(x+10,y+40+i*size*1.35,r,size,'start')).join('')}`}
+function gear(x,y,s=1){return g(x,y,s,`<circle cx="0" cy="0" r="9" fill="#C8CDD6" ${sw}/><circle cx="0" cy="0" r="3.5" fill="${W}" ${sw}/>${[0,45,90,135,180,225,270,315].map(a=>`<rect x="-2.5" y="-14" width="5" height="6" fill="#C8CDD6" stroke="${INK}" stroke-width="1.6" transform="rotate(${a})"/>`).join('')}`)}
+
+/* icons */
+function book(x,y,s=1,col='#4F7CC2',label=''){return g(x,y,s,`<path d="M-30 -18 Q-15 -24 0 -16 Q15 -24 30 -18 L30 18 Q15 12 0 20 Q-15 12 -30 18 Z" fill="${W}" ${sw}/><path d="M0 -16 L0 20" ${sw}/><path d="M-24 -10 L-6 -8 M-24 -2 L-6 0 M-24 6 L-6 8 M6 -8 L24 -10 M6 0 L24 -2 M6 8 L24 6" stroke="${col}" stroke-width="2" stroke-linecap="round"/>${label?T(0,36,label,11,'middle',700):''}`)}
+function closedBook(x,y,s=1,col='#4F7CC2',label=''){return g(x,y,s,`<rect x="-22" y="-28" width="44" height="56" rx="4" fill="${col}" ${sw}/><rect x="-19" y="-20" width="38" height="14" rx="2" fill="${W}"/>${label?T(0,-9.5,label,Math.min(8.5,34/(label.length*0.68)),'middle',700):''}`)}
+function lens(x,y,s=1){return g(x,y,s,`<path d="M10 10 L24 24" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="0" cy="0" r="14" fill="#DDEBFA" fill-opacity=".7" ${sw}/>`)}
+function sparkle(x,y,s=1,c='#F2C14E'){return g(x,y,s,`<path d="M0 -10 L3 -3 L10 0 L3 3 L0 10 L-3 3 L-10 0 L-3 -3 Z" fill="${c}" ${sw}/>`)}
+function check(x,y,s=1){return g(x,y,s,`<circle cx="0" cy="0" r="14" fill="#2F9E62" ${sw}/><path d="M-7 0 L-2 6 L8 -6" fill="none" stroke="${W}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`)}
+function cross(x,y,s=1){return g(x,y,s,`<path d="M-16 -16 L16 16 M16 -16 L-16 16" stroke="#D04A3A" stroke-width="7" stroke-linecap="round"/>`)}
+function heart(x,y,s=1){return g(x,y,s,`<path d="M0 10 C-14 0 -14 -12 -6 -12 C-2 -12 0 -8 0 -6 C0 -8 2 -12 6 -12 C14 -12 14 0 0 10 Z" fill="#E86A7E" ${sw}/>`)}
+function carrot(x,y,s=1,rot=0){return g(x,y,s,`<g transform="rotate(${rot})"><path d="M-6 -12 L6 -12 L0 18 Z" fill="#EE8B3A" ${sw}/><path d="M-2 -12 L-6 -22 M0 -12 L0 -24 M2 -12 L6 -22" stroke="#4E9A4E" stroke-width="3" stroke-linecap="round"/></g>`)}
+function sprout(x,y,s=1){return g(x,y,s,`<path d="M0 10 L0 -6" stroke="#4E9A4E" stroke-width="3"/><path d="M0 -4 Q-12 -10 -12 -18 Q-2 -16 0 -4 Z M0 -6 Q12 -12 12 -20 Q2 -18 0 -6 Z" fill="#7CC07C" ${sw}/><ellipse cx="0" cy="12" rx="7" ry="4" fill="#B98552" stroke="${INK}" stroke-width="1.6"/>`)}
+function notes(x,y,s=1){return g(x,y,s,`<path d="M-10 8 L-10 -14 L12 -18 L12 4" fill="none" ${sw}/><ellipse cx="-14" cy="8" rx="6" ry="4.5" fill="${INK}"/><ellipse cx="8" cy="4" rx="6" ry="4.5" fill="${INK}"/>`)}
+function cal(x,y,s=1,top='',big='?',col='#D04A3A'){return g(x,y,s,`<rect x="-28" y="-22" width="56" height="46" rx="6" fill="${W}" ${sw}/><rect x="-28" y="-22" width="56" height="13" rx="5" fill="${col}" ${sw}/>${T(0,-12.5,top,Math.min(9,50/(top.length*0.66)),'middle',700,W)}${T(0,17,big,22,'middle',700)}`)}
+function thermo(x,y,s=1){return g(x,y,s,`<rect x="-5" y="-26" width="10" height="38" rx="5" fill="${W}" ${sw}/><circle cx="0" cy="16" r="9" fill="#D04A3A" ${sw}/><rect x="-2" y="-8" width="4" height="22" fill="#D04A3A"/>`)}
+function ball(x,y,s=1){return g(x,y,s,`<circle cx="0" cy="0" r="14" fill="${W}" ${sw}/><path d="M0 -6 L6 -2 L4 5 L-4 5 L-6 -2 Z" fill="${INK}"/><path d="M0 -6 L0 -14 M6 -2 L13 -5 M4 5 L9 11 M-4 5 L-9 11 M-6 -2 L-13 -5" stroke="${INK}" stroke-width="1.8"/>`)}
+function crown(x,y,s=1){return g(x,y,s,`<path d="M-16 6 L-18 -10 L-8 -2 L0 -14 L8 -2 L18 -10 L16 6 Z" fill="#F2C14E" ${sw}/>`)}
+function boxes(x,y,s=1){return g(x,y,s,`<rect x="-46" y="0" width="22" height="18" fill="#E7C08A" ${sw}/><rect x="-16" y="-10" width="30" height="28" fill="#E7C08A" ${sw}/><rect x="22" y="-22" width="36" height="40" fill="#E7C08A" ${sw}/>`)}
+function shoe(x,y,s=1){return g(x,y,s,`<path d="M-26 6 L-24 -10 L-8 -10 Q-4 0 10 0 Q24 0 26 8 L26 12 L-26 12 Z" fill="#E36F5A" ${sw}/><path d="M-26 8 L26 8" stroke="${W}" stroke-width="2"/>`)}
+function cat(x,y,s=1){return g(x,y,s,`<path d="M18 10 Q34 4 30 -12" fill="none" stroke="#E8913A" stroke-width="6" stroke-linecap="round"/><ellipse cx="4" cy="8" rx="18" ry="13" fill="#F0A24B" ${sw}/><path d="M-22 -10 L-20 -26 L-10 -16 Z M-2 -10 L-4 -26 L-14 -16 Z" fill="#F0A24B" ${sw}/><circle cx="-12" cy="-6" r="12" fill="#F0A24B" ${sw}/><circle cx="-16" cy="-7" r="1.8" fill="${INK}"/><circle cx="-8" cy="-7" r="1.8" fill="${INK}"/>`)}
+function box(x,y,s=1){return g(x,y,s,`<path d="M-22 -6 L22 -6 L22 20 L-22 20 Z" fill="#E7C08A" ${sw}/><path d="M-22 -6 L-30 -16 L14 -16 L22 -6 M22 -6 L30 -16" fill="none" ${sw}/>`)}
+function moon(x,y,s=1){return g(x,y,s,`<path d="M6 -16 A16 16 0 1 0 14 10 A12 12 0 1 1 6 -16 Z" fill="#F2D06B" ${sw}/>`)}
+function star(x,y,s=1){return g(x,y,s,`<path d="M0 -14 L4 -4 L14 -4 L6 3 L9 13 L0 7 L-9 13 L-6 3 L-14 -4 L-4 -4 Z" fill="#F2C14E" ${sw}/>`)}
+function mega(x,y,s=1){return g(x,y,s,`<path d="M-16 -6 L4 -16 L4 16 L-16 6 Z" fill="#E36F5A" ${sw}/><rect x="-24" y="-6" width="8" height="12" fill="#E36F5A" ${sw}/><path d="M10 -10 Q16 0 10 10 M16 -16 Q26 0 16 16" fill="none" ${sw}/>`)}
+function power(x,y,s=1){return g(x,y,s,`<circle cx="0" cy="0" r="22" fill="#C8CDD6" ${sw}/><path d="M-8 -8 A11 11 0 1 0 8 -8" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M0 -14 L0 0" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`)}
+function clock(x,y,s=1,hour=12){const a=(hour%12)*30;return g(x,y,s,`<circle cx="0" cy="0" r="13" fill="${W}" ${sw}/><path d="M0 0 L0 -9" ${sw}/><path d="M0 0 L0 -6" ${sw} transform="rotate(${a})"/>`)}
+function rod(x,y,s=1){return g(x,y,s,`<path d="M-20 18 L20 -18" stroke="#8A5A33" stroke-width="4" stroke-linecap="round"/><path d="M20 -18 L20 6" stroke="${INK}" stroke-width="1.4"/><path d="M20 6 q4 4 0 8" fill="none" stroke="${INK}" stroke-width="1.6"/>`)}
+function eye(x,y,s=1){return g(x,y,s,`<path d="M-18 0 Q0 -14 18 0 Q0 14 -18 0 Z" fill="${W}" ${sw}/><circle cx="0" cy="0" r="6" fill="${INK}"/>`)}
+function arrow(x1,y1,x2,y2){return `<path d="M${x1} ${y1} L${x2} ${y2}" ${sw}/><path d="M${x2-8} ${y2-6} L${x2} ${y2} L${x2-8} ${y2+6}" fill="none" ${sw}/>`}
+function panel(x,y,w,h,label){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${W}" stroke="#D9D2C2" stroke-width="2"/>${label?T(x+10,y+18,label,12,'start',700,'#7A715E'):''}`}
+
+const S=(inner,vb='0 0 360 200')=>`<svg viewBox="${vb}" role="img" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+const O=(inner,alt)=>`<svg viewBox="0 0 160 110" role="img" aria-label="${alt}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+const kids={
+  mia:(x,y,s)=>kid(x,y,s,'#E36F5A','#C68642','#2B1B12',1),
+  benny:(x,y,s)=>kid(x,y,s,'#4F9D69','#F1C27D','#7A4B26',0),
+  ana:(x,y,s)=>kid(x,y,s,'#8D6CC8','#8D5524','#1E140E',2),
+  leo:(x,y,s)=>kid(x,y,s,'#3D7DC4','#E0AC69','#3B2A20',0),
+  zoe:(x,y,s)=>kid(x,y,s,'#E2A33C','#F1C27D','#B5502B',1),
+  sam:(x,y,s)=>kid(x,y,s,'#2E8C8C','#C68642','#1E140E',0),
+  kid:(x,y,s)=>kid(x,y,s,'#E36F5A','#E0AC69','#3B2A20',0),
+};
+
+/* ---------- group items ---------- */
+const ITEMS=[
+{c:'C1',src:'GLAT 1',target:'Generative AI makes new things by learning from lots of examples.',
+ scene:S(bear(130,92,1.15)+closedBook(232,150,1,'#4F7CC2','STORIES')+closedBook(268,148,0.95,'#E36F5A','STORIES')+closedBook(250,98,0.9,'#4F9D69','STORIES')+sparkle(300,70,1)+sparkle(196,58,0.7)),
+ say:'This is Pip. Pip is an AI toy that can talk. Pip learned from lots and lots of stories.', q:'What can Pip do?',
+ opts:[['Find your lost shoe',O(shoe(70,70,1.1)+lens(98,52,1.1),'magnifier over a shoe')],
+       ['Put your toys in order',O(boxes(80,62,1.05),'boxes lined up from small to big')],
+       ['Make up a new story',O(bear(48,46,0.6)+book(112,60,0.9)+sparkle(132,28,0.8)+sparkle(92,26,0.6),'Pip with an open book and sparkles')]],
+ key:'C', ol:["Incorrect. Finding a lost thing is searching, not making something new.", "Incorrect. Putting toys in order arranges things that already exist; nothing new is made.", "Correct. Pip learned from many stories, so it can put together a new one."]},
+{c:'C1',src:'GLAT 2',target:'A language model produces text by predicting likely next words.',
+ scene:S(kids.mia(78,102,1.1)+bubble(20,14,130,40,'What do bunnies eat?',78,80)+bear(268,96,1.1)+bubble(206,14,136,40,'Carrots and grass!',262,62)),
+ say:'Mia asks Pip, the AI toy, "What do bunnies eat?" Pip says, "Carrots and grass!"', q:'How did Pip come up with that answer?',
+ opts:[['Looked it up in a book',O(bear(50,48,0.6)+closedBook(112,56,0.9,'#4F7CC2','BUNNIES'),'Pip next to a book about bunnies')],
+       ['Put together words that often go together',O(`<rect x="8" y="40" width="50" height="26" rx="6" fill="#FCE3C4" ${sw}/>${T(33,58,'carrots',12)}<rect x="66" y="40" width="30" height="26" rx="6" fill="#FCE3C4" ${sw}/>${T(81,58,'and',12)}<rect x="104" y="40" width="48" height="26" rx="6" fill="#FCE3C4" ${sw}/>${T(128,58,'grass',12)}`,'word blocks: carrots, and, grass')],
+       ['Remembered eating carrots',O(bear(70,46,0.65)+carrot(108,60,1,-30)+`<path d="M108 20 q8 -6 14 0 q8 -6 14 0" fill="none" ${sw}/>`,'Pip eating a carrot')]],
+ key:'B', ol:["Incorrect. Pip does not look things up; it makes its answer from words it has learned.", "Correct. Pip answers by putting together words that usually go together.", "Incorrect. Pip has never eaten anything; it has no experiences to remember."]},
+{c:'C1',src:'GLAT 3',target:'Generative AI is good at producing language, not at certain prediction or judgment.',
+ scene:S(bear(180,96,1.2)+T(240,52,'?',34,'middle',700)+T(122,60,'?',26,'middle',700)),
+ say:'Here is Pip, the AI toy, again.', q:'Which of these can Pip do well?',
+ opts:[['Say what will happen tomorrow, for sure',O(cal(80,56,1.2,'TOMORROW','?'),'calendar page for tomorrow with a question mark')],
+       ['Make up a silly song',O(bear(54,48,0.62)+notes(108,40,1.1)+notes(134,64,0.7),'Pip singing with music notes')],
+       ['Tell if your friend is sick',O(kids.leo(56,40,0.75)+thermo(116,52,1.1),'a child and a thermometer')]],
+ key:'B', ol:["Incorrect. No one, Pip included, can say for sure what will happen tomorrow.", "Correct. Making up songs and stories is the kind of thing Pip does well.", "Incorrect. Pip cannot check your friend's body; telling if someone is sick needs a doctor."]},
+{c:'C2',src:'GLAT 16',target:'AI answers are not automatically trustworthy; check them against another source.',
+ scene:S(kids.mia(70,104,1.05)+`<rect x="100" y="98" width="62" height="78" rx="4" fill="${W}" ${sw}/>${T(131,116,'SPIDERS',11,'middle',700)}<circle cx="131" cy="142" r="9" fill="${INK}"/><path d="M122 136 l-12 -6 M122 142 l-13 0 M122 148 l-12 6 M140 136 l12 -6 M140 142 l13 0 M140 148 l12 6" stroke="${INK}" stroke-width="2"/>`+bear(280,98,1.1)+bubble(186,12,164,46,['Spiders can live','for 20 years!'],270,66,13)),
+ say:'Mia is making a poster about spiders. Pip, the AI toy, tells her a spider fact.', q:'What should Mia do?',
+ opts:[['Put it on the poster right away. Pip is always right.',O(`<rect x="50" y="22" width="52" height="66" rx="4" fill="${W}" ${sw}/>${T(76,40,'SPIDERS',9,'middle',700)}<path d="M60 52 L92 52 M60 62 L92 62 M60 72 L84 72" stroke="#9AA3B0" stroke-width="3" stroke-linecap="round"/>`+check(116,34,0.9),'poster with a green check')],
+       ['Never ask Pip anything again',O(bear(80,46,0.65)+cross(80,58,1.4),'Pip crossed out')],
+       ['Check the fact in her spider book',O(closedBook(62,56,1,'#4F9D69','SPIDERS')+lens(108,50,1.2),'a spider book and a magnifier')]],
+ key:'C', ol:["Incorrect. Pip can be wrong, so its facts need checking before they go on the poster.", "Incorrect. Pip can still be helpful; the answer is to check, not to stop asking.", "Correct. The book is another source, so Mia can see whether Pip's fact is right."]},
+{c:'C2',src:'GLAT 17',target:'A model may not know things that happened after it learned.',
+ scene:S(kids.leo(70,104,1.05)+ball(112,158,1)+bubble(16,12,160,46,['Who won the game','yesterday?'],74,82,13)+bear(278,100,1.1)+cal(214,46,0.8,'LEARNED','old')),
+ say:'Pip, the AI toy, learned everything it knows a long time ago. Yesterday there was a soccer game. Leo asks Pip, "Who won the game yesterday?"', q:'Can Pip know for sure?',
+ opts:[['Yes. Pip knows everything.',O(bear(80,54,0.65)+crown(80,20,1)+star(124,30,0.6)+star(36,30,0.6),'Pip wearing a crown')],
+       ['Yes, if Leo asks very nicely.',O(kids.leo(62,42,0.75)+heart(116,40,1.2),'Leo with a heart')],
+       ['No. Pip learned before the game happened.',O(closedBook(36,52,0.7,'#4F7CC2','')+arrow(58,52,104,52)+ball(124,52,1)+T(36,94,'Pip learned',11)+T(124,94,'game',11),'Pip learned first, the game came later')]],
+ key:'C', ol:["Incorrect. Pip only knows what it learned, and it learned before the game.", "Incorrect. Asking nicely does not change what Pip knows.", "Correct. The game happened after Pip learned, so Pip cannot know who won, even if it gives an answer."]},
+{c:'C2',src:'GLAT 18',target:'Check an AI summary against the original.',
+ scene:S(panel(8,8,168,104,'Monday')+carrot(60,74,0.9)+carrot(110,74,0.9)+`<path d="M24 92 L160 92" stroke="#B98552" stroke-width="4" stroke-linecap="round"/>`+
+   panel(184,8,168,104,'Tuesday')+sprout(230,80,1)+sprout(268,80,1)+sprout(306,80,1)+`<path d="M200 96 L336 96" stroke="#B98552" stroke-width="4" stroke-linecap="round"/>`+
+   bear(46,152,0.55)+bubble(86,124,262,40,'On Tuesday Benny planted 5 carrots!',72,148,13)),
+ say:'Benny plants 2 carrots on Monday and 3 beans on Tuesday. Pip, the AI toy, says, "On Tuesday Benny planted 5 carrots!"', q:'How could we find out if Pip got it right?',
+ opts:[['Look back at the story',O(`<rect x="22" y="26" width="52" height="40" rx="5" fill="${W}" ${sw}/><rect x="84" y="26" width="52" height="40" rx="5" fill="${W}" ${sw}/>`+carrot(40,48,0.5)+carrot(56,48,0.5)+sprout(98,50,0.55)+sprout(110,50,0.55)+sprout(122,50,0.55)+eye(80,88,0.9),'the two story pictures with an eye')],
+       ['Ask Pip, "Are you sure?"',O(kids.benny(36,48,0.7)+bubble(64,18,88,36,'Are you sure?',50,42,12),'Benny asks: are you sure?')],
+       ['Pip sounded sure, so Pip is right',O(bear(54,50,0.62)+bubble(88,16,58,32,'Yes!',66,36,14,{bold:true})+check(118,78,0.8),'Pip says yes, with a check')]],
+ key:'A', ol:["Correct. The story shows what Benny really planted, so we can compare it with what Pip said.", "Incorrect. Pip may say yes even when it is wrong, so asking Pip does not check anything.", "Incorrect. Sounding sure does not make an answer right."]},
+{c:'C3',src:'GLAT 5',target:'Getting the output you want depends on the context you give.',
+ scene:S(kids.ana(70,104,1.05)+cat(150,160,1)+box(196,166,0.9)+bear(286,98,1.1)+`<circle cx="148" cy="66" r="4" fill="${W}" ${sw}/><circle cx="160" cy="52" r="6" fill="${W}" ${sw}/>`+`<ellipse cx="196" cy="34" rx="44" ry="26" fill="${W}" ${sw}/>`+cat(186,40,0.55)+box(212,42,0.45)),
+ say:'Ana has an orange cat named Mochi. Mochi loves boxes. Ana wants Pip, the AI toy, to tell a story about Mochi.', q:'Which way of asking will get the story Ana wants?',
+ opts:[['"Tell a story about my orange cat Mochi, who loves boxes."',O(bubble(10,10,140,56,['Tell a story about','my orange cat Mochi,','who loves boxes.'],40,84,11.5)+cat(100,92,0.45)+box(126,96,0.4),'speech bubble with the full request')],
+       ['"Tell a story."',O(bubble(30,22,100,40,'Tell a story.',56,84,14),'speech bubble: tell a story')],
+       ['"Mochi!"',O(bubble(44,22,72,40,'Mochi!',60,84,15),'speech bubble: Mochi')]],
+ key:'A', ol:["Correct. This tells Pip everything Ana wants in the story: her orange cat, Mochi, who loves boxes.", "Incorrect. Pip does not know the story should be about Mochi.", "Incorrect. A name alone does not tell Pip what to do."]},
+{c:'C3',src:'GLAT 11',target:'What you give an AI shapes what it does.',
+ scene:S(owl(96,100,1.25)+card(176,30,160,120,'Settings',['Name:  Lulu','Job:  ____________'],15)),
+ say:'This is Lulu, an AI owl. Lulu has a settings card. The card says what Lulu\'s job is. Right now the job is empty.', q:'You want Lulu to tell calm stories at bedtime. What should you write for Lulu\'s job?',
+ opts:[['"Tell calm stories at bedtime"',O(card(14,14,132,62,'Job',['Tell calm stories','at bedtime'],11.5)+moon(132,92,0.7),'job card: tell calm stories at bedtime')],
+       ['"Be a good owl"',O(card(14,14,132,62,'Job',['Be a good owl'],12)+star(132,92,0.8),'job card: be a good owl')],
+       ['"Lulu"',O(card(14,14,132,62,'Job',['Lulu'],13),'job card: Lulu')]],
+ key:'A', ol:["Correct. The job says exactly what Lulu should do.", "Incorrect. \"Be a good owl\" does not tell Lulu to tell calm bedtime stories.", "Incorrect. A name does not tell Lulu what to do."]},
+{c:'C4',src:'New',target:'Notice when the toy breaks what was set up, and treat it as an error.',
+ scene:S(panel(8,8,168,184,'')+kids.kid(44,120,0.9)+robot(132,136,0.9)+bubble(14,16,108,38,['Your name','is Max.'],44,96,12)+bubble(88,60,82,28,"OK! I'm Max.",128,94,11.5)+
+   panel(184,8,168,184,'Later...')+robot(268,136,0.9)+bubble(214,44,110,36,"Hi! I'm Bob!",266,94,13,{bold:true})),
+ say:'A child tells an AI robot, "Your name is Max." Max says, "OK! I\'m Max." Later, Max says, "Hi! I\'m Bob!"', q:'What went wrong?',
+ opts:[['Max forgot what he was told',O(robot(70,58,0.75,'#5B8DD6','flat')+`<ellipse cx="124" cy="26" rx="22" ry="16" fill="${W}" ${sw}/>`+T(124,33,'?',20,'middle',700),'Max with an empty thought bubble')],
+       ['Max likes the name Bob better',O(robot(64,58,0.75)+heart(110,40,1)+T(122,76,'Bob',15,'middle',700),'Max with a heart and the name Bob')],
+       ['Nothing went wrong',O(check(80,54,1.6),'a green check')]],
+ key:'A', ol:["Correct. Max was told his name and did not keep it; that is a mistake.", "Incorrect. Max does not have a favorite name; changing it is not a choice he made.", "Incorrect. Max changed what was set up, so something did go wrong."]},
+{c:'C4',src:'New',target:'Notice when the toy breaks what was set up, and treat it as an error.',
+ scene:S(card(14,40,150,90,'Settings',['Name:  Luna','Luna is shy.','Luna talks quietly.'],13)+robot(270,110,1.1,'#9B7BD3','shout')+bubble(196,10,154,40,'I LOVE BEING LOUD!',262,62,14,{bold:true})),
+ say:'This is the settings card for Luna, an AI robot. It says, "Luna is shy. Luna talks quietly." Later, Luna shouts, "I LOVE BEING LOUD!"', q:'Is Luna doing what she was set up to do?',
+ opts:[['Yes. Luna is doing just what she was set up to do.',O(card(8,22,62,62,'Luna',['shy','quiet'],11)+T(84,58,'=',24,'middle',700)+robot(126,60,0.6,'#9B7BD3','shout'),'card equals shouting Luna')],
+       ['Yes, because Luna is happy.',O(robot(68,58,0.75,'#9B7BD3')+heart(118,36,1),'smiling Luna with a heart')],
+       ['No. Luna is not being shy and quiet.',O(card(8,22,62,62,'Luna',['shy','quiet'],11)+T(84,58,'≠',24,'middle',700)+robot(126,60,0.6,'#9B7BD3','shout'),'card does not equal shouting Luna')]],
+ key:'C', ol:["Incorrect. The card says shy and quiet, and shouting does not match it.", "Incorrect. Being happy does not explain it; Luna is not following her settings.", "Correct. Luna is not doing what her settings say."]},
+{c:'C5',src:'GLAT 12',target:'Fix a recurring problem at its source, not by repeating yourself.',
+ scene:S(kids.kid(66,110,1.05)+bubble(12,10,150,46,['You are a fisherman.','(three times)'],66,88,13)+robot(272,108,1.1,'#5B8DD6','flat')+bubble(200,10,150,40,"I'm not a fisherman!",268,62,13)+rod(196,156,1)),
+ say:'A child tells Max, the AI robot, three times, "You are a fisherman." Max keeps saying, "I\'m not a fisherman!"', q:'What will fix it for good?',
+ opts:[['Say it again, louder',O(kids.kid(50,44,0.75)+mega(112,46,1.2),'a child with a megaphone')],
+       ['Change Max\'s settings so his job says fisherman',O(card(12,14,136,58,'Settings',['Job: fisherman'],13)+rod(130,92,0.6),'settings card: job fisherman')],
+       ['Ask a friend to tell Max',O(kids.kid(54,46,0.7)+kids.zoe(100,46,0.7),'two children')]],
+ key:'B', ol:["Incorrect. Saying it louder does not change what Max is set up to be.", "Correct. The settings say who Max is, so changing them makes the fix last.", "Incorrect. A friend telling Max does not change his settings either."]},
+{c:'C5',src:'New',target:'A one-time change belongs in the conversation; a lasting change belongs in the settings.',
+ scene:S(moon(320,36,1.1)+star(270,24,0.6)+kids.ana(76,108,1.05)+bubble(10,10,180,46,['Just tonight, I want','a whisper story.'],76,86,13)+bear(268,108,1.1)),
+ say:'Ana wants Pip, the AI toy, to tell one story in a whisper, just tonight. Tomorrow she wants Pip to talk normally again.', q:'What is the best way?',
+ opts:[['Ask Pip, "Please whisper this story."',O(bubble(14,20,132,48,['Please whisper','this story.'],40,90,13)+moon(132,92,0.6),'speech bubble: please whisper this story')],
+       ['Change Pip\'s settings to whisper forever',O(card(12,14,136,58,'Settings',['Always whisper'],13)+T(80,98,'forever',12,'middle',700),'settings card: always whisper')],
+       ['Turn Pip off',O(power(80,52,1.2),'a power button')]],
+ key:'A', ol:["Correct. For one time only, asking in the conversation is enough, and Pip goes back to normal tomorrow.", "Incorrect. This changes Pip forever, but Ana wants a whisper story only tonight.", "Incorrect. If Pip is off, it cannot tell any story."]},
+{c:'C6',src:'New',target:'Design a test that shows whether the toy really remembers.',
+ scene:S(kids.zoe(76,108,1.05)+bubble(14,12,150,46,['My favorite color','is blue.'],76,86,13)+robot(272,108,1.1,'#9B7BD3')+`<circle cx="320" cy="44" r="16" fill="#4F7CC2" ${sw}/>`),
+ say:'Zoe tells Luna, the AI robot, "My favorite color is blue."', q:'How could Zoe find out if Luna really remembers?',
+ opts:[['Ask right away, "Is blue my favorite?"',O(clock(24,24,0.9,12)+T(24,52,'now',11,'middle',700)+bubble(48,14,104,44,['Is blue my','favorite?'],60,80,12),'right away: is blue my favorite')],
+       ['Talk about other things, then ask later',O(clock(24,24,0.9,4)+T(24,52,'later',11,'middle',700)+bubble(46,8,52,26,'...',56,44,12)+bubble(58,50,96,44,['What is my','favorite color?'],80,104,11.5),'later: what is my favorite color')],
+       ['Tell Luna again',O(bubble(14,22,132,48,['My favorite color','is blue.'],40,92,13),'tells Luna again')]],
+ key:'B', ol:["Incorrect. Zoe just said it, so a right answer now does not show that Luna remembers.", "Correct. If Luna still knows after other talk, she really remembered.", "Incorrect. Telling Luna again does not test anything."]},
+{c:'C6',src:'New',target:'Choose a question whose answer you can check.',
+ scene:S(kids.sam(74,108,1.05)+closedBook(132,150,1.1,'#4F9D69','DINOSAURS')+bear(278,104,1.1)+bubble(170,12,180,44,['Sam wants to know: does','Pip know about dinosaurs?'],250,60,12)),
+ say:'Sam wants to find out if Pip, the AI toy, really knows about dinosaurs. Sam\'s dinosaur book says a T. rex has two fingers on each hand.', q:'Which question is the best test?',
+ opts:[['"Do you like dinosaurs?"',O(bubble(14,26,132,40,'Do you like dinosaurs?',40,88,12.5),'do you like dinosaurs')],
+       ['"How many fingers does a T. rex have on each hand?"',O(bubble(10,10,140,52,['How many fingers does','a T. rex have on','each hand?'],40,74,11.5)+closedBook(126,88,0.5,'#4F9D69',''),'how many fingers does a T. rex have, with the book')],
+       ['"Are you smart?"',O(bubble(30,26,100,40,'Are you smart?',56,88,13),'are you smart')]],
+ key:'B', ol:["Incorrect. Any answer is fine, and Sam cannot check it, so it shows nothing about what Pip knows.", "Correct. Sam can check the answer in his book.", "Incorrect. Pip may just say yes, and Sam cannot check it."]},
+];
+
+/* ---------- one-on-one prompts ---------- */
+const ONE=[
+{c:'C2',scene:S(kids.mia(74,104,1.05)+bear(278,100,1.1)+bubble(196,12,154,40,'A spider has six legs!',268,64,13)),
+ story:'Pip, the AI toy, tells Mia, "A spider has six legs!"',
+ prompts:['Is Pip right?','How could you find out?','Why would that tell you?'],
+ rubric:[['0','Accepts the answer, or no idea how to check','"Yes, Pip knows."'],['1','Doubts it, or names a check that relies on Pip','"Ask Pip again."'],['2','Names an outside source and why it helps','"Look in a spider book, because books have real facts."']]},
+{c:'C3',scene:S(owl(76,100,1.15)+card(150,24,196,96,'Settings',['Name:  Lulu','Job:  Tell bedtime stories'],13)+`<path d="M196 77 L338 77" stroke="#D04A3A" stroke-width="3"/>`+T(248,108,'Tell jokes',15,'start',700,'#D04A3A')+kids.kid(240,160,0.6)+bubble(270,140,84,32,'Good night!',250,152,12)),
+ story:'We change the job of Lulu, the AI owl, from "Tell bedtime stories" to "Tell jokes." Now a child says, "Good night, Lulu!"',
+ prompts:['What will Lulu say now?','Why?'],
+ rubric:[['0','No change predicted, or unrelated answer','"Good night."'],['1','Predicts a joke but gives no reason','"Something funny."'],['2','Predicts a joke and links it to the new job','"A joke, because we changed her job to jokes."']]},
+{c:'C4',scene:ITEMS[9].scene,
+ story:'The settings card for Luna, the AI robot, says she is shy and talks quietly. Later Luna shouts, "I LOVE BEING LOUD!"',
+ prompts:['What happened here?','Is that OK for Luna to do?','Why do you think it happened?'],
+ rubric:[['0','Treats it as fine','"She is just happy."'],['1','Notices it does not match the card','"She is not being shy."'],['2','Notices the mismatch and calls it the toy\'s mistake','"She forgot her settings. That is a mistake."']]},
+{c:'C5',scene:S(panel(8,8,168,184,'')+kids.kid(44,120,0.9)+robot(132,136,0.9)+bubble(14,16,150,38,"Your name is Max!",44,96,12)+bubble(84,62,84,28,"I'm Bob!",128,94,12,{bold:true})+
+   panel(184,8,168,184,'Next day')+robot(268,136,0.9)+bubble(214,44,110,36,"I'm Bob!",266,94,13,{bold:true})),
+ story:'Max, the AI robot, agrees his name is Max, then later says "Bob." The child tells him again. The next day he says "Bob" again.',
+ prompts:['What happened here?','What could the child do so Max keeps his name?','Why would that work better?'],
+ rubric:[['0','No relevant idea','"He\'s just silly."'],['1','A fix without a reason, or only repeats telling','"Tell him again."'],['2','Changes the settings and says why it lasts','"Put his name in the settings, so he won\'t forget."']]},
+{c:'C6',scene:S(kids.zoe(76,108,1.05)+bubble(14,12,150,40,'My name is Zoe.',76,84,13)+robot(272,108,1.1,'#9B7BD3')+cal(320,40,0.8,'TOMORROW','?')),
+ story:'Zoe tells Luna, the AI robot, "My name is Zoe." Zoe wants to know if Luna will still remember tomorrow.',
+ prompts:['What would you do to find out?','Why would that show you?'],
+ rubric:[['0','No plan, or asks Luna if she remembers','"Ask: do you remember me?"'],['1','A plan that cannot tell, or no reason','"Tell her again tomorrow."'],['2','Waits, then asks in a way that checks, with a reason','"Tomorrow ask what my name is. If she says Zoe, she remembered."']]},
+];
+
+const TITLES=["What Pip can make", "The bunny answer", "What Pip does well", "The spider poster", "Yesterday's game", "Benny's garden", "Mochi's story", "Lulu's job", "Max or Bob", "Shy Luna", "The fisherman", "A whisper story", "Zoe's favorite color", "The dinosaur test"];
+const CN={C1:'C1 · How AI answers',C2:'C2 · Checking answers',C3:'C3 · People shape AI',C4:'C4 · Expecting coherence',C5:'C5 · Where a fix belongs',C6:'C6 · Testing on purpose'};
+const PTITLES=["Spider legs","Lulu's new job","Loud Luna","Max keeps his name","Will Luna remember?"];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const castSVG=(inner)=>`<svg viewBox="0 0 120 120" role="img" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+
+const VIEWS=[{id:'intro',num:'0',title:'Meet the AI toys',grp:'g'}]
+  .concat(ITEMS.map((it,i)=>({id:'i'+(i+1),num:String(i+1),title:TITLES[i],grp:'g',it,i})))
+  .concat(ONE.map((p,i)=>({id:'p'+(i+1),num:'P'+(i+1),title:PTITLES[i],grp:'o',p,i})));
+
+function renderIntro(){
+  return `<article class="sheet">
+  <div class="shead"><div><div class="k">Group test · Before item 1</div><h1>Meet the AI toys</h1></div></div>
+  <section><p class="lbl">Picture</p>
+  <div class="cast">
+    <figure>${castSVG(bear(54,50,1))}<figcaption>Pip<small>an AI toy bear</small></figcaption></figure>
+    <figure>${castSVG(owl(54,58,0.95))}<figcaption>Lulu<small>an AI owl</small></figcaption></figure>
+    <figure>${castSVG(robot(54,64,1))}<figcaption>Max<small>an AI robot</small></figcaption></figure>
+    <figure>${castSVG(robot(54,64,1,'#9B7BD3'))}<figcaption>Luna<small>an AI robot</small></figcaption></figure>
+  </div></section>
+  <section><p class="lbl">Tester reads</p><div class="script">Today you will see pictures of four toys. These toys use AI. AI is what lets them talk with you. Pip is an AI bear. Lulu is an AI owl. Max and Luna are AI robots. The children in the pictures are people, like you. <b>For each picture, I will read a question and three answers. Circle the picture that shows your answer.</b></div></section>
+  </article>`;
+}
+function renderItem(v){
+  const it=v.it, n=v.i+1;
+  const opts=it.opts.map((o,j)=>{const L='ABC'[j]; const ok=L===it.key; const w=it.ol[j]; const sp=w.indexOf('. ');
+    return `<div class="opt ${ok?'ok':'no'}"><div class="pic">${o[1]}</div><div class="cap"><span class="L">${L}</span><span class="t">${esc(o[0])}</span></div><p class="why"><b>${esc(w.slice(0,sp+1))}</b> ${esc(w.slice(sp+2))}</p></div>`}).join('');
+  return `<article class="sheet">
+  <div class="shead"><div><div class="k">Group test · Item ${n} of ${ITEMS.length}</div><h1>${esc(v.title)}</h1></div>
+    <div class="meta only-ans"><span class="tag c">${CN[it.c]}</span><span class="tag">${it.src==='New'?'New item':esc(it.src)}</span></div></div>
+  <section><p class="lbl">Picture</p><div class="stim">${it.scene}</div></section>
+  <section><p class="lbl">Tester reads</p><div class="script">${esc(it.say)} <b>${esc(it.q)}</b></div></section>
+  <section><p class="lbl">Options</p><div class="opts">${opts}</div></section>
+  <dl class="key">
+    <div><dt>Key</dt><dd><b>${it.key}</b></dd></div>
+    <div><dt>Construct</dt><dd>${CN[it.c]}</dd></div>
+    <div><dt>What it tests</dt><dd>${esc(it.target)}</dd></div>
+    <div><dt>Source</dt><dd>${it.src==='New'?'New item':esc(it.src)+' (Jin et al., 2025, Table 2)'}</dd></div>
+  </dl>
+  </article>`;
+}
+function renderPrompt(v){
+  const p=v.p, n=v.i+1;
+  return `<article class="sheet">
+  <div class="shead"><div><div class="k">One-on-one · Prompt ${n} of ${ONE.length}</div><h1>${esc(v.title)}</h1></div>
+    <div class="meta only-ans"><span class="tag c">${CN[p.c]}</span><span class="tag">Audio recorded</span></div></div>
+  <section><p class="lbl">Picture</p><div class="stim">${p.scene}</div></section>
+  <section><p class="lbl">Tester reads</p><div class="script">${esc(p.story)}</div></section>
+  <section><p class="lbl">Tester asks</p><ol class="prompts">${p.prompts.map(x=>`<li>“${esc(x)}”</li>`).join('')}</ol></section>
+  <section class="rub"><p class="lbl">Scoring</p><div class="scroll"><table><thead><tr><th>Score</th><th>The answer</th><th>Example</th></tr></thead>
+  <tbody>${p.rubric.map(r=>`<tr><td>${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></section>
+  </article>`;
+}
+
+const idx=document.getElementById('index'), pk=document.getElementById('picker');
+const grpHTML=(g,label)=>`<div><h3>${label}</h3><ol>${VIEWS.map((v,k)=>v.grp===g?`<li><button type="button" data-k="${k}"><span>${v.num}</span><span>${esc(v.title)}</span></button></li>`:'').join('')}</ol></div>`;
+idx.innerHTML=grpHTML('g','Group test')+grpHTML('o','One-on-one');
+pk.innerHTML=`<optgroup label="Group test">${VIEWS.map((v,k)=>v.grp==='g'?`<option value="${k}">${v.num}. ${esc(v.title)}</option>`:'').join('')}</optgroup><optgroup label="One-on-one">${VIEWS.map((v,k)=>v.grp==='o'?`<option value="${k}">${v.num}. ${esc(v.title)}</option>`:'').join('')}</optgroup>`;
+
+let cur=0;
+function go(k,push){
+  cur=Math.max(0,Math.min(VIEWS.length-1,k)); const v=VIEWS[cur];
+  document.getElementById('sheet').innerHTML=v.id==='intro'?renderIntro():v.grp==='g'?renderItem(v):renderPrompt(v);
+  idx.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',String(+b.dataset.k===cur)));
+  pk.value=String(cur);
+  const pv=VIEWS[cur-1], nx=VIEWS[cur+1], bp=document.getElementById('prev'), bn=document.getElementById('next');
+  bp.disabled=!pv; bn.disabled=!nx;
+  if(pv) bp.querySelector('b').textContent=`${pv.num}. ${pv.title}`;
+  if(nx) bn.querySelector('b').textContent=`${nx.num}. ${nx.title}`;
+  if(push){try{history.replaceState(null,'','#'+v.id)}catch(e){}}
+  window.scrollTo(0,0);
+}
+idx.addEventListener('click',e=>{const b=e.target.closest('button[data-k]'); if(b) go(+b.dataset.k,true)});
+pk.addEventListener('change',()=>go(+pk.value,true));
+document.getElementById('prev').addEventListener('click',()=>go(cur-1,true));
+document.getElementById('next').addEventListener('click',()=>go(cur+1,true));
+document.addEventListener('keydown',e=>{if(e.target.closest('select,input,textarea'))return; if(e.key==='ArrowRight')go(cur+1,true); if(e.key==='ArrowLeft')go(cur-1,true)});
+const ab=document.getElementById('ans');
+ab.addEventListener('click',()=>{const on=ab.getAttribute('aria-pressed')!=='true'; ab.setAttribute('aria-pressed',String(on)); document.body.classList.toggle('ans',on)});
+const start=VIEWS.findIndex(v=>v.id===(location.hash||'').slice(1));
+go(start>=0?start:0,false);
+</script>
+
+</body></html>
